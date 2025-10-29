@@ -8,6 +8,15 @@ interface ResultsProps {
   onRestart: () => void;
 }
 
+// Simple markdown parser for bold (**) and italic (*)
+const SimpleMarkdown: React.FC<{ text: string }> = ({ text }) => {
+  const html = text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>');
+  
+  return <span dangerouslySetInnerHTML={{ __html: html }} />;
+};
+
 const Results: React.FC<ResultsProps> = ({ summary, allAnswers, onRestart }) => {
   const yesCount = allAnswers.filter(ans => ans.value).length;
   const noCount = allAnswers.length - yesCount;
@@ -33,8 +42,10 @@ const Results: React.FC<ResultsProps> = ({ summary, allAnswers, onRestart }) => 
       <div className="bg-white border border-stone-300 p-6 mb-8">
         <h3 className="font-bold text-xl mb-4">Executive Summary</h3>
         <div className="prose prose-lg max-w-none text-stone-800" style={{ fontFamily: "'Times New Roman', Times, serif" }}>
-            {summary.split('\n').map((paragraph, index) => (
-              <p key={index} className="mb-4">{paragraph}</p>
+            {summary.split('\n').filter(p => p.trim()).map((paragraph, index) => (
+              <p key={index} className="mb-4">
+                <SimpleMarkdown text={paragraph} />
+              </p>
             ))}
         </div>
       </div>

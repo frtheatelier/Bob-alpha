@@ -21,14 +21,14 @@ const getRandomQuestions = (questions: string[], count: number): string[] => {
 export const generateQuestions = async (previousAnswers: Answer[]): Promise<string[]> => {
   const model = "gemini-2.5-flash";
   const prompt = `You are a psychometric test designer for a surrealist academic experiment. 
-  Based on the following user responses defining a character named 'Bob' (answered with 'Yes' or 'No'), generate exactly 10 new, increasingly absurd and philosophical questions to probe deeper.
+  Based on the following user responses defining a character named 'Bob' (answered with 'Yes' or 'No'), generate exactly 5 new, increasingly absurd and philosophical questions to probe deeper.
   The questions must be direct Yes/No questions.
   The absurdity should be subtle at first, then escalate. Touch on themes of existence, consciousness, and the mundane.
   
   Previous answers:
   ${formatAnswers(previousAnswers)}
   
-  Generate the next 10 questions.`;
+  Generate the next 5 questions.`;
 
   try {
     const response = await ai.models.generateContent({
@@ -51,20 +51,20 @@ export const generateQuestions = async (previousAnswers: Answer[]): Promise<stri
     const jsonString = response.text;
     const parsed = JSON.parse(jsonString);
     if (parsed.questions && Array.isArray(parsed.questions) && parsed.questions.length > 0) {
-      return parsed.questions.slice(0, 10); // Ensure we only return 10
+      return parsed.questions.slice(0, 5); // Ensure we only return 5
     }
     throw new Error("Invalid response format from API.");
   } catch (error) {
     console.warn("AI question generation failed. Using fallback questions.", error);
     // Determine which part we're generating for based on number of answers
-    // 10 answers means we are generating for part 2
-    // 20 answers means we are generating for part 3
-    const partNumber = (previousAnswers.length / 10) + 1;
+    // 5 answers means we are generating for part 2
+    // 10 answers means we are generating for part 3
+    const partNumber = (previousAnswers.length / 5) + 1;
 
     if (partNumber === 2) {
-      return getRandomQuestions(FALLBACK_PART_2_QUESTIONS, 10);
+      return getRandomQuestions(FALLBACK_PART_2_QUESTIONS, 5);
     } else if (partNumber === 3) {
-      return getRandomQuestions(FALLBACK_PART_3_QUESTIONS, 10);
+      return getRandomQuestions(FALLBACK_PART_3_QUESTIONS, 5);
     } else {
       // This should not happen in the current app flow, but it's a good safeguard
       console.error("Attempted to generate fallback questions for an invalid part number:", partNumber);
@@ -78,7 +78,7 @@ export const generateSummary = async (allAnswers: Answer[]): Promise<string> => 
   const prompt = `You are a research psychologist from a strange, esoteric university, writing a final report.
   Analyze the following personality quiz answers that define a character named 'Bob'. The answers are 'Yes' or 'No'.
   Write a detailed, analytical, and slightly absurd summary of Bob's personality.
-  Use academic jargon, invent some pseudo-scientific concepts, and create some fictional statistics based on the provided answer patterns to make it sound official.
+  Use academic jargon, invent some pseudo-scientific concepts, and create some fictional statistics based on the provided answer patterns to make it sound official. Use markdown for emphasis (e.g., **bold** for key terms, *italic* for nuance).
   The tone should be serious, but the subject matter is the user's definition of this fictional entity. Conclude with a definitive-sounding, yet ambiguous statement about Bob.
 
   Here are the complete answers:

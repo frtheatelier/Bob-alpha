@@ -9,6 +9,11 @@ import LoadingSpinner from './components/LoadingSpinner';
 
 type AppState = 'intro' | 'quiz' | 'loading' | 'results' | 'error';
 
+const getRandomQuestions = (questions: string[], count: number): string[] => {
+  const shuffled = [...questions].sort(() => 0.5 - Math.random());
+  return shuffled.slice(0, count);
+};
+
 const Disclaimer: React.FC<{ onAgree: () => void }> = ({ onAgree }) => (
   <div className="fixed inset-0 bg-stone-200 bg-opacity-75 backdrop-blur-sm flex items-center justify-center p-4 z-50">
     <div className="bg-stone-50 p-8 max-w-lg w-full border-2 border-stone-900 text-stone-900">
@@ -44,7 +49,7 @@ const IntroScreen: React.FC<{ onStart: () => void }> = ({ onStart }) => (
       Your responses will construct a unique psychological profile. There are no right or wrong answers, only your subjective truth.
     </p>
     <p className="text-base text-stone-500 mb-10">
-      The procedure consists of three parts. The initial baseline inquiry will be followed by two adaptive, AI-generated question sets designed to probe the emergent characteristics of your construct.
+      The procedure consists of three parts, each with five questions. The initial baseline inquiry will be followed by two adaptive, AI-generated question sets designed to probe the emergent characteristics of your construct.
     </p>
     <button
       onClick={onStart}
@@ -58,7 +63,7 @@ const IntroScreen: React.FC<{ onStart: () => void }> = ({ onStart }) => (
 const App: React.FC = () => {
   const [appState, setAppState] = useState<AppState>('intro');
   const [quizPart, setQuizPart] = useState<number>(1);
-  const [questions, setQuestions] = useState<string[]>(PART_1_QUESTIONS);
+  const [questions, setQuestions] = useState<string[]>(() => getRandomQuestions(PART_1_QUESTIONS, 5));
   const [allAnswers, setAllAnswers] = useState<Answer[]>([]);
   const [summary, setSummary] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
@@ -68,7 +73,7 @@ const App: React.FC = () => {
   const resetState = () => {
     setAppState('intro');
     setQuizPart(1);
-    setQuestions(PART_1_QUESTIONS);
+    setQuestions(getRandomQuestions(PART_1_QUESTIONS, 5));
     setAllAnswers([]);
     setSummary('');
     setError(null);
