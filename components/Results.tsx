@@ -25,13 +25,14 @@ const Results: React.FC<ResultsProps> = ({ summary, allAnswers, onRestart }) => 
   return (
     <div className="w-full max-w-3xl mx-auto p-4 md:p-8">
       <header className="text-center mb-8 border-b-2 border-stone-900 pb-4">
+        <p className="text-xs uppercase tracking-widest text-stone-500 mb-2">Institute for Ontological Inquiry</p>
         <h2 className="text-sm uppercase tracking-widest text-stone-600">Conclusion // Case File #{caseId}</h2>
         <h1 className="text-4xl font-bold">Psychometric Profile: Bob</h1>
       </header>
       
       <div className="bg-white border border-stone-300 p-6 mb-8">
         <h3 className="font-bold text-xl mb-4">Executive Summary</h3>
-        <div className="prose prose-lg max-w-none text-stone-800" style={{ fontFamily: "'EB Garamond', serif" }}>
+        <div className="prose prose-lg max-w-none text-stone-800" style={{ fontFamily: "'Times New Roman', Times, serif" }}>
             {summary.split('\n').map((paragraph, index) => (
               <p key={index} className="mb-4">{paragraph}</p>
             ))}

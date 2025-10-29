@@ -11,37 +11,41 @@ interface QuestionProps {
 }
 
 const Question: React.FC<QuestionProps> = ({ question, questionNumber, totalQuestions, value, onAnswer }) => {
+  const questionId = `q-${questionNumber}`;
   return (
-    <div className="py-6 border-b border-stone-300">
-      <p className="text-stone-500 text-sm mb-2">
-        QUESTION {String(questionNumber).padStart(2, '0')} / {String(totalQuestions).padStart(2, '0')}
+    <div className="py-4 border-b border-stone-300">
+      <p className="text-stone-500 text-xs uppercase tracking-wider mb-2">
+        Question {String(questionNumber).padStart(2, '0')} / {String(totalQuestions).padStart(2, '0')}
       </p>
-      <p className="text-xl mb-4 text-stone-800">{question}</p>
-      <div className="flex items-center gap-4">
-        <button
-          onClick={() => onAnswer(false)}
-          className={`px-10 py-3 text-lg border-2 font-bold transition-colors duration-150 w-full md:w-auto ${
-            value === false
-              ? 'bg-stone-900 text-white border-stone-900'
-              : 'bg-transparent text-stone-700 border-stone-400 hover:bg-stone-200 hover:border-stone-700'
-          }`}
-        >
-          No
-        </button>
-        <button
-          onClick={() => onAnswer(true)}
-          className={`px-10 py-3 text-lg border-2 font-bold transition-colors duration-150 w-full md:w-auto ${
-            value === true
-              ? 'bg-stone-900 text-white border-stone-900'
-              : 'bg-transparent text-stone-700 border-stone-400 hover:bg-stone-200 hover:border-stone-700'
-          }`}
-        >
-          Yes
-        </button>
+      <div className="flex items-start gap-4 md:gap-6">
+        <div className="flex gap-4 pt-1">
+          <label className="flex items-center gap-2 cursor-pointer text-sm">
+            <input
+              type="radio"
+              name={questionId}
+              checked={value === true}
+              onChange={() => onAnswer(true)}
+              className="w-4 h-4 cursor-pointer"
+            />
+            Yes
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer text-sm">
+            <input
+              type="radio"
+              name={questionId}
+              checked={value === false}
+              onChange={() => onAnswer(false)}
+              className="w-4 h-4 cursor-pointer"
+            />
+            No
+          </label>
+        </div>
+        <p className="text-base text-stone-900 flex-1">{question}</p>
       </div>
     </div>
   );
 };
+
 
 interface QuizPartProps {
   questions: string[];
@@ -78,11 +82,12 @@ const QuizPart: React.FC<QuizPartProps> = ({ questions, partNumber, onComplete }
   return (
     <div className="w-full max-w-3xl mx-auto p-4 md:p-8">
       <header className="text-center mb-8 border-b-2 border-stone-900 pb-4">
+        <p className="text-xs uppercase tracking-widest text-stone-500 mb-2">Institute for Ontological Inquiry</p>
         <h2 className="text-sm uppercase tracking-widest text-stone-600">Part {String(partNumber).padStart(2, '0')}</h2>
         <h1 className="text-4xl font-bold">{partTitles[partNumber] || `Inquiry ${partNumber}`}</h1>
       </header>
       
-      <div className="space-y-4">
+      <div className="space-y-2">
         {questions.map((q, index) => (
           <Question
             key={index}
