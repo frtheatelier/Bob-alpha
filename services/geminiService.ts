@@ -1,6 +1,7 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
 import { Answer } from '../types';
+import { FALLBACK_PART_2_QUESTIONS, FALLBACK_PART_3_QUESTIONS } from '../constants';
 
 if (!process.env.API_KEY) {
   throw new Error("API_KEY environment variable is not set.");
@@ -10,6 +11,11 @@ const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 const formatAnswers = (answers: Answer[]): string => {
   return answers.map(a => `Q: ${a.question}\nA: ${a.value ? 'Yes' : 'No'}`).join('\n');
+};
+
+const getRandomQuestions = (questions: string[], count: number): string[] => {
+  const shuffled = [...questions].sort(() => 0.5 - Math.random());
+  return shuffled.slice(0, count);
 };
 
 export const generateQuestions = async (previousAnswers: Answer[]): Promise<string[]> => {
@@ -44,13 +50,26 @@ export const generateQuestions = async (previousAnswers: Answer[]): Promise<stri
 
     const jsonString = response.text;
     const parsed = JSON.parse(jsonString);
-    if (parsed.questions && Array.isArray(parsed.questions)) {
-      return parsed.questions;
+    if (parsed.questions && Array.isArray(parsed.questions) && parsed.questions.length > 0) {
+      return parsed.questions.slice(0, 10); // Ensure we only return 10
     }
     throw new Error("Invalid response format from API.");
   } catch (error) {
-    console.error("Error generating questions:", error);
-    throw new Error("Failed to generate new questions. Please try again.");
+    console.warn("AI question generation failed. Using fallback questions.", error);
+    // Determine which part we're generating for based on number of answers
+    // 10 answers means we are generating for part 2
+    // 20 answers means we are generating for part 3
+    const partNumber = (previousAnswers.length / 10) + 1;
+
+    if (partNumber === 2) {
+      return getRandomQuestions(FALLBACK_PART_2_QUESTIONS, 10);
+    } else if (partNumber === 3) {
+      return getRandomQuestions(FALLBACK_PART_3_QUESTIONS, 10);
+    } else {
+      // This should not happen in the current app flow, but it's a good safeguard
+      console.error("Attempted to generate fallback questions for an invalid part number:", partNumber);
+      throw new Error("Failed to generate new questions. Please try again.");
+    }
   }
 };
 
